@@ -1,5 +1,10 @@
 package io.github.gecko10000.VirtualPrivateNo;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.sql.SQLHelper;
 
@@ -10,10 +15,12 @@ import java.util.UUID;
 public class VirtualPrivateNo extends JavaPlugin {
 
     SQLHelper sql;
+    NamespacedKey noAlertKey;
 
     public void onEnable() {
         saveDefaultConfig();
         startDatabase();
+        noAlertKey = new NamespacedKey(this, "no_alerts");
         new Listeners(this);
         new CommandHandler(this);
     }
@@ -52,6 +59,16 @@ public class VirtualPrivateNo extends JavaPlugin {
 
     public boolean isWhitelisted(UUID uuid) {
         return sql.querySingleResult("SELECT uuid FROM whitelist WHERE uuid=?;", uuid) != null;
+    }
+
+    public void inform(String name) {
+        Component alert = MiniMessage.markdown().parse(
+                getConfig().getString("staffMessage")
+                        .replace("%player%", name));
+        Bukkit.getOnlinePlayers().stream()
+                .filter(p -> p.hasPermission("vpno.alerts"))
+                .filter(p -> !p.getPersistentDataContainer().has(noAlertKey, PersistentDataType.BYTE))
+                .forEach(p -> p.sendMessage(alert));
     }
 
 }

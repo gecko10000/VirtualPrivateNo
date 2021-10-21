@@ -1,17 +1,17 @@
 package io.github.gecko10000.VirtualPrivateNo;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.misc.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -26,8 +26,7 @@ public class CommandHandler {
         // for proper tab completion upon removal
         ArgType<String> whitelistedArg = new ArgType<>("whitelisted", u -> u)
                 .setTab((sender -> {
-                    List<String> uuids = plugin.sql.queryResultList("SELECT uuid from whitelist;");
-                    List<String> names = plugin.sql.queryResultList("SELECT uuid from whitelist;").stream()
+                    return plugin.sql.queryResultList("SELECT uuid from whitelist;").stream()
                             .map(String.class::cast)
                             .map(UUID::fromString)
                             .map(uuid -> {
@@ -35,7 +34,6 @@ public class CommandHandler {
                                 return name == null ? uuid.toString() : name;
                             })
                             .collect(Collectors.toList());
-                    return names;
                 }));
         new CommandParser(plugin.getResource("command.rdcml"))
                 .setArgTypes(whitelistedArg)
@@ -75,17 +73,29 @@ public class CommandHandler {
         });
     }
 
+    @CommandHook("alerts")
+    public void toggleAlerts(Player player) {
+        PersistentDataContainer pdc = player.getPersistentDataContainer();
+        boolean alerts = !pdc.has(plugin.noAlertKey, PersistentDataType.BYTE);
+        if (alerts) {
+            pdc.set(plugin.noAlertKey, PersistentDataType.BYTE, (byte) 1);
+        } else {
+            pdc.remove(plugin.noAlertKey);
+        }
+        player.sendMessage(MiniMessage.markdown().parse("<green>Turned your alerts " + (alerts ? "off." : "on.")));
+    }
+
     private CompletableFuture<OfflinePlayer> getOfflinePlayer(String target) {
         Player player = Bukkit.getPlayer(target);
-        CompletableFuture<OfflinePlayer> uuid = new CompletableFuture<>();
+        CompletableFuture<OfflinePlayer> offlinePlayer = new CompletableFuture<>();
         if (player != null) {
-            uuid.complete(player);
+            offlinePlayer.complete(player);
         } else {
             Task.asyncDelayed(() -> {
-                uuid.complete(target.length() > 16 ? Bukkit.getOfflinePlayer(UUID.fromString(target)) : Bukkit.getOfflinePlayer(target));
+                offlinePlayer.complete(target.length() > 16 ? Bukkit.getOfflinePlayer(UUID.fromString(target)) : Bukkit.getOfflinePlayer(target));
             });
         }
-        return uuid;
+        return offlinePlayer;
     }
 
 }

@@ -37,18 +37,19 @@ public class Listeners implements Listener {
         if (plugin.isWhitelisted(event.getUniqueId())) {
             return;
         }
-        AsyncPlayerPreLoginEvent.Result result = isVPN(event.getAddress().getHostAddress())
+        String ip = event.getAddress().getHostAddress();
+        AsyncPlayerPreLoginEvent.Result result = isVPN(ip)
                 ? AsyncPlayerPreLoginEvent.Result.KICK_OTHER : AsyncPlayerPreLoginEvent.Result.ALLOWED;
         event.disallow(result, MiniMessage.markdown().parse(plugin.getConfig().getString("kickMessage")));
+        if (result != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+            plugin.inform(event.getName());
+        }
     }
 
     private boolean isVPN(String ip) {
         int ipInt = plugin.ipToInt(ip);
         Integer vpn = plugin.sql.querySingleResult("SELECT vpn FROM ips WHERE ip=?;", ipInt);
-        if (vpn != null) {
-            return vpn > 0;
-        }
-        return webReq(ip);
+        return vpn != null ? vpn > 0 : webReq(ip);
     }
 
     private boolean webReq(String ip) {

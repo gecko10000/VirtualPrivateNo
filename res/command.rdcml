@@ -16,4 +16,10 @@ vpno,vpn,antivpn {
             hook remove
         }
     }
+    alerts {
+        permission vpno.alerts
+        user player
+        help Toggle your VPN alerts
+        hook alerts
+    }
 }
