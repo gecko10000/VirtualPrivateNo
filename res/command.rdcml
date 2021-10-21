@@ -1,0 +1,19 @@
+vpno,vpn,antivpn {
+    permission vpno.command
+    reload {
+        permission vpno.reload
+        help Reload the config
+        hook reload
+    }
+    whitelist {
+        permission vpno.whitelist
+        add string:target {
+            help Add a player to the VPN whitelist
+            hook add
+        }
+        remove whitelisted:target {
+            help Remove a player from the VPN whitelist
+            hook remove
+        }
+    }
+}

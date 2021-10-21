@@ -5,6 +5,7 @@ import redempt.redlib.sql.SQLHelper;
 
 import java.sql.Connection;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 public class VirtualPrivateNo extends JavaPlugin {
 
@@ -14,6 +15,7 @@ public class VirtualPrivateNo extends JavaPlugin {
         saveDefaultConfig();
         startDatabase();
         new Listeners(this);
+        new CommandHandler(this);
     }
 
     public void onDisable() {
@@ -24,7 +26,8 @@ public class VirtualPrivateNo extends JavaPlugin {
     private void startDatabase() {
         Connection connection = SQLHelper.openSQLite(getDataFolder().toPath().resolve("ipcache.db"));
         sql = new SQLHelper(connection);
-        sql.execute("CREATE TABLE IF NOT EXISTS ips (ip INT, vpn BIT(1));");
+        sql.execute("CREATE TABLE IF NOT EXISTS ips (ip INT PRIMARY KEY, vpn BIT(1));");
+        sql.execute("CREATE TABLE IF NOT EXISTS whitelist (uuid STRING PRIMARY KEY);");
         sql.setAutoCommit(false);
     }
 
@@ -45,6 +48,10 @@ public class VirtualPrivateNo extends JavaPlugin {
             ip.add((mask >>> (i*8)) + "");
         }
         return ip.toString();
+    }
+
+    public boolean isWhitelisted(UUID uuid) {
+        return sql.querySingleResult("SELECT uuid FROM whitelist WHERE uuid=?;", uuid) != null;
     }
 
 }

@@ -34,6 +34,9 @@ public class Listeners implements Listener {
         if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
             return;
         }
+        if (plugin.isWhitelisted(event.getUniqueId())) {
+            return;
+        }
         AsyncPlayerPreLoginEvent.Result result = isVPN(event.getAddress().getHostAddress())
                 ? AsyncPlayerPreLoginEvent.Result.KICK_OTHER : AsyncPlayerPreLoginEvent.Result.ALLOWED;
         event.disallow(result, MiniMessage.markdown().parse(plugin.getConfig().getString("kickMessage")));
