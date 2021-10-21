@@ -42,7 +42,7 @@ public class VirtualPrivateNo extends JavaPlugin {
         for (int i = 0; i < 4; i++) {
             int mask = 255 << (i * 8);
             mask &= compact;
-            ip.add((mask >> (i*8)) + "");
+            ip.add((mask >>> (i*8)) + "");
         }
         return ip.toString();
     }
