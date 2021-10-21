@@ -57,6 +57,7 @@ public class CommandHandler {
                 return;
             }
             plugin.sql.execute("INSERT INTO whitelist (uuid) VALUES (?);", player.getUniqueId());
+            plugin.sql.commit();
             sender.sendMessage(MiniMessage.markdown().parse("<green>Added " + player.getName() + " to the whitelist."));
         });
     }
@@ -69,6 +70,7 @@ public class CommandHandler {
                 return;
             }
             plugin.sql.execute("DELETE FROM whitelist WHERE uuid=?;", player.getUniqueId());
+            plugin.sql.commit();
             sender.sendMessage(MiniMessage.markdown().parse("<green>Removed " + target + " from the whitelist."));
         });
     }
