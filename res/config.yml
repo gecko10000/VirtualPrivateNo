@@ -1,1 +1,2 @@
-requestUrl: "funkemunky.cc/vpn?ip=`%ip%&cached=USE_WEB_CACHE"
+requestUrl: "https://funkemunky.cc/vpn?ip=%ip%&cached=USE_WEB_CACHE"
+kickMessage: "<red>VPNs are not allowed on this server."

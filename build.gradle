@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 sourceSets {
@@ -21,8 +22,10 @@ targetCompatibility=16
 
 repositories {
     maven { url "https://papermc.io/repo/repository/maven-public/" }
+    mavenCentral()
 }
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT"
+    implementation "net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT"
 }
