@@ -40,6 +40,15 @@ public class Listeners implements Listener {
     }
 
     private boolean isVPN(String ip) {
+        int ipInt = plugin.ipToInt(ip);
+        Integer vpn = plugin.sql.querySingleResult("SELECT vpn FROM ips WHERE ip=?;", ipInt);
+        if (vpn != null) {
+            return vpn > 0;
+        }
+        return webReq(ip);
+    }
+
+    private boolean webReq(String ip) {
         String requestUrl = plugin.getConfig().getString("requestUrl")
                 .replace("%ip%", ip);
         HttpRequest request = HttpRequest.newBuilder(URI.create(requestUrl)).build();
@@ -50,9 +59,11 @@ public class Listeners implements Listener {
             e.printStackTrace();
             return false;
         }
-        Bukkit.broadcast(Component.text(response.body()));
         JsonObject object = gson.fromJson(response.body(), JsonObject.class);
-        return object.getAsJsonPrimitive("proxy").getAsBoolean();
+        boolean proxy = object.getAsJsonPrimitive("proxy").getAsBoolean();
+        plugin.sql.execute("INSERT INTO ips (ip, vpn) VALUES (?, ?)", plugin.ipToInt(ip), proxy ? 1 : 0);
+        plugin.sql.commit();
+        return proxy;
     }
 
 }
