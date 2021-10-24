@@ -2,3 +2,9 @@
 /.gradle/
 /build/
 /build/classes/java/main/
+/.idea/*
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+/gradlew
+/gradlew.bat
+/settings.gradle
