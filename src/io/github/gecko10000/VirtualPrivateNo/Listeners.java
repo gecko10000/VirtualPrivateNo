@@ -64,6 +64,10 @@ public class Listeners implements Listener {
             return false;
         }
         JsonObject object = gson.fromJson(response.body(), JsonObject.class);
+        if (!object.getAsJsonPrimitive("success").getAsBoolean()) {
+            plugin.getLogger().warning("API request was unsuccessful.");
+            return false;
+        }
         boolean proxy = object.getAsJsonPrimitive("proxy").getAsBoolean();
         plugin.sql.execute("INSERT INTO ips (ip, vpn) VALUES (?, ?)", plugin.ipToInt(ip), proxy ? 1 : 0);
         plugin.sql.commit();
