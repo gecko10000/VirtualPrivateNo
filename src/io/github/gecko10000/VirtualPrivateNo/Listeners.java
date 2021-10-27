@@ -2,10 +2,8 @@ package io.github.gecko10000.VirtualPrivateNo;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,7 +38,7 @@ public class Listeners implements Listener {
         String ip = event.getAddress().getHostAddress();
         AsyncPlayerPreLoginEvent.Result result = isVPN(ip)
                 ? AsyncPlayerPreLoginEvent.Result.KICK_OTHER : AsyncPlayerPreLoginEvent.Result.ALLOWED;
-        event.disallow(result, MiniMessage.markdown().parse(plugin.getConfig().getString("kickMessage")));
+        event.disallow(result, ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("kickMessage")));
         if (result != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
             plugin.inform(event.getName());
         }
