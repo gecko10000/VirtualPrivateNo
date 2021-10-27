@@ -1,6 +1,5 @@
 package io.github.gecko10000.VirtualPrivateNo;
 
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -12,7 +11,6 @@ import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.misc.Task;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -44,19 +42,19 @@ public class CommandHandler {
     public void reload(CommandSender sender) {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
-        sender.sendMessage(MiniMessage.markdown().parse("<green>Config reloaded!"));
+        plugin.sendMessage(sender, "<green>Config reloaded!");
     }
 
     @CommandHook("add")
     public void addPlayer(CommandSender sender, String target) {
         getOfflinePlayer(target).thenAccept(player -> {
             if (plugin.isWhitelisted(player.getUniqueId())) {
-                sender.sendMessage(MiniMessage.markdown().parse("<red>" + player.getName() + " is already whitelisted!"));
+                plugin.sendMessage(sender, "&c" + player.getName() + " is already whitelisted!");
                 return;
             }
             plugin.sql.execute("INSERT INTO whitelist (uuid) VALUES (?);", player.getUniqueId());
             plugin.sql.commit();
-            sender.sendMessage(MiniMessage.markdown().parse("<green>Added " + player.getName() + " to the whitelist."));
+            plugin.sendMessage(sender, "&aAdded " + player.getName() + " to the whitelist.");
         });
     }
 
@@ -64,12 +62,12 @@ public class CommandHandler {
     public void removePlayer(CommandSender sender, String target) {
         getOfflinePlayer(target).thenAccept(player -> {
             if (!plugin.isWhitelisted(player.getUniqueId())) {
-                sender.sendMessage(MiniMessage.markdown().parse("<red>" + target + " is not whitelisted!"));
+                plugin.sendMessage(sender, "&c" + target + " is not whitelisted!");
                 return;
             }
             plugin.sql.execute("DELETE FROM whitelist WHERE uuid=?;", player.getUniqueId());
             plugin.sql.commit();
-            sender.sendMessage(MiniMessage.markdown().parse("<green>Removed " + target + " from the whitelist."));
+            plugin.sendMessage(sender, "&aRemoved " + target + " from the whitelist.");
         });
     }
 
@@ -82,7 +80,7 @@ public class CommandHandler {
         } else {
             pdc.remove(plugin.noAlertKey);
         }
-        player.sendMessage(MiniMessage.markdown().parse("<green>Turned your alerts " + (alerts ? "off." : "on.")));
+        plugin.sendMessage(player, "&aTurned your alerts " + (alerts ? "off." : "on."));
     }
 
     private CompletableFuture<OfflinePlayer> getOfflinePlayer(String target) {

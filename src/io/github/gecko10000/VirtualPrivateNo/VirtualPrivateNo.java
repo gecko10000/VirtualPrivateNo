@@ -1,9 +1,9 @@
 package io.github.gecko10000.VirtualPrivateNo;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.sql.SQLHelper;
@@ -62,13 +62,16 @@ public class VirtualPrivateNo extends JavaPlugin {
     }
 
     public void inform(String name) {
-        Component alert = MiniMessage.markdown().parse(
-                getConfig().getString("staffMessage")
-                        .replace("%player%", name));
+        String informMessage = getConfig().getString("staffMessage")
+                        .replace("%player%", name);
         Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.hasPermission("vpno.alerts"))
                 .filter(p -> !p.getPersistentDataContainer().has(noAlertKey, PersistentDataType.BYTE))
-                .forEach(p -> p.sendMessage(alert));
+                .forEach(p -> sendMessage(p, informMessage));
+    }
+
+    public void sendMessage(CommandSender sender, String input) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', input));
     }
 
 }
